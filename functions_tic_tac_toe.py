@@ -2,8 +2,6 @@ import pygame
 import random
 import sys
 
-pygame.init()
-
 # board
 ROWS = 3
 COLUMNS = 3
@@ -18,11 +16,12 @@ GREEN = (0, 255, 0)
 GRAY = (180, 180, 180)
 D_GRAY = (80, 80, 80)
 
+pygame.init()
 
+# creates display of game board
 screen_size = (COLUMNS * SQUARESIZE + (2 * BORDER), ROWS * SQUARESIZE + (2 * BORDER))
 screen = pygame.display.set_mode(screen_size)
 pygame.display.set_caption("TIC-TAC-TOE")
-
 
 # takes size, text, color of new message to be displayed
 # returns configured text block and width,height dimensions
@@ -40,16 +39,24 @@ def message(size, word, color):
     return set_color, get_dimension[2], get_dimension[3]
 
 
+# displays start game menu for user to choose move order
+# resets variables from previous games
 def start_game():
+    # represents game board
     grid = [["", "", ""], 
             ["", "", ""], 
             ["", "", ""]]
 
+    # move number 
     curr_turn = 1
 
+    # whether the board is filled without a three in a row
     tie = False
 
+    # covers win message from previous game 
     pygame.draw.rect(screen, BLACK, (0, 0, COLUMNS * SQUARESIZE + (BORDER * 2), BORDER))
+    
+    # draws menu rectangle to display choices
     pygame.draw.rect(screen, GRAY, (BORDER, BORDER, COLUMNS * SQUARESIZE, ROWS * SQUARESIZE))
     pygame.draw.rect(screen, BLACK, (0, ROWS * SQUARESIZE + BORDER, COLUMNS * SQUARESIZE + (BORDER * 2), BORDER))
    
@@ -121,36 +128,84 @@ def get_score(temp_grid, curr_turn, player_icon, ai_icon):
         d2.append(temp_grid[r][COLUMNS - r - 1])
 
         if temp_grid[r].count(player_icon) == 2 and temp_grid[r].count(ai_icon) < 1:
-            total -= 80
+            total -= 100
         if temp_grid[r].count(player_icon) == 0 and temp_grid[r].count(ai_icon) == 2:
             total += 20
-        if temp_grid[r].count(player_icon) == 0 and temp_grid[r].count(ai_icon) == 1:
-            total += 8
 
         for c in range(COLUMNS):
             if c == 0:
                 c1.append(temp_grid[r][c])
+                if r == 0 or r == ROWS - 1 and temp_grid[r][c] == ai_icon:
+                    total += 10
             elif c == 1:
                 c2.append(temp_grid[r][c])
             elif c == 2:
                 c3.append(temp_grid[r][c])
+                if r == 0 or r == ROWS - 1 and temp_grid[r][c] == ai_icon:
+                    total += 10
             
     for i in range(len(grid_array)):
         if grid_array[i].count(player_icon) == 2 and grid_array[i].count(ai_icon) < 1:
-            total -= 80
+            total -= 100
         if i < COLUMNS:
-
             if grid_array[i].count(player_icon) == 0 and grid_array[i].count(ai_icon) == 2:
                 total += 20
-            if grid_array[i].count(player_icon) == 0 and grid_array[i].count(ai_icon) == 1:
-                total += 8   
         else:
             if grid_array[i].count(player_icon) == 0 and grid_array[i].count(ai_icon) == 2:
                 total += 16
-            if grid_array[i].count(player_icon) == 0 and grid_array[i].count(ai_icon) == 1:
-                total += 6
-    if curr_turn == 1 and temp_grid[1][1] == ai_icon:
-        total -= 80
+
+    if curr_turn == 2 and temp_grid[1][1] == ai_icon:
+        total += 100
+
+
+
+
+    # total = 0
+    # if check_win(temp_grid):
+    #     total += 1000
+    # c1 = []
+    # c2 = []
+    # c3 = []
+    # d1 = []
+    # d2 = []
+    # grid_array = [c1, c2, c3, d1, d2]
+    # for r in range(ROWS):
+    #     d1.append(temp_grid[r][r])
+    #     d2.append(temp_grid[r][COLUMNS - r - 1])
+
+    #     if temp_grid[r].count(player_icon) == 2 and temp_grid[r].count(ai_icon) < 1:
+    #         total -= 100
+    #     if temp_grid[r].count(player_icon) == 0 and temp_grid[r].count(ai_icon) == 2:
+    #         total += 20
+    #     if temp_grid[r].count(player_icon) == 0 and temp_grid[r].count(ai_icon) == 1:
+    #         total += 8
+
+    #     for c in range(COLUMNS):
+    #         if c == 0:
+    #             c1.append(temp_grid[r][c])
+    #         elif c == 1:
+    #             c2.append(temp_grid[r][c])
+    #         elif c == 2:
+    #             c3.append(temp_grid[r][c])
+            
+    # for i in range(len(grid_array)):
+    #     if grid_array[i].count(player_icon) == 2 and grid_array[i].count(ai_icon) < 1:
+    #         total -= 100
+    #     if i < COLUMNS:
+    #         if grid_array[i].count(player_icon) == 0 and grid_array[i].count(ai_icon) == 2:
+    #             total += 20
+    #         if grid_array[i].count(player_icon) == 0 and grid_array[i].count(ai_icon) == 1:
+    #             total += 8   
+    #     else:
+    #         if grid_array[i].count(player_icon) == 0 and grid_array[i].count(ai_icon) == 2:
+    #             total += 16
+    #         if grid_array[i].count(player_icon) == 0 and grid_array[i].count(ai_icon) == 1:
+    #             total += 6
+
+    # if curr_turn == 1 and temp_grid[1][1] == ai_icon:
+    #     total -= 100
+    # if curr_turn == 2 and temp_grid[1][1] == ai_icon:
+    #     total += 1000
 
     return total
 
