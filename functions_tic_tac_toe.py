@@ -14,11 +14,9 @@ WIDTH = 5
 # colors
 BLACK = (0, 0, 0)
 RED = (255, 0, 0)
-BLUE = (0, 0, 255)
 GREEN = (0, 255, 0)
 GRAY = (180, 180, 180)
 D_GRAY = (80, 80, 80)
-WHITE = (255, 255, 255)
 
 
 screen_size = (COLUMNS * SQUARESIZE + (2 * BORDER), ROWS * SQUARESIZE + (2 * BORDER))
@@ -53,17 +51,8 @@ def start_game():
 
     pygame.draw.rect(screen, BLACK, (0, 0, COLUMNS * SQUARESIZE + (BORDER * 2), BORDER))
     pygame.draw.rect(screen, GRAY, (BORDER, BORDER, COLUMNS * SQUARESIZE, ROWS * SQUARESIZE))
-    
-    text, x2, y2 = message(18, "PLAYER 1 - X", RED)
-    x1 = (SQUARESIZE + BORDER - x2) / 2
-    y1 = (BORDER + WIDTH- y2) / 2
-    screen.blit(text, (x1, ROWS * SQUARESIZE + BORDER + y1, BORDER + SQUARESIZE, BORDER))
-    
-    text, x2, y2 = message(18, "PLAYER 2 - O", RED)
-    x1 = (SQUARESIZE + BORDER - x2) / 2
-    y1 = (BORDER + WIDTH - y2) / 2
-    screen.blit(text, (SQUARESIZE * 2 + BORDER + x1, ROWS * SQUARESIZE + BORDER + y1, BORDER + SQUARESIZE, BORDER))
-
+    pygame.draw.rect(screen, BLACK, (0, ROWS * SQUARESIZE + BORDER, COLUMNS * SQUARESIZE + (BORDER * 2), BORDER))
+   
     for r in range(ROWS):
         for c in range(COLUMNS):
             pygame.draw.rect(screen, BLACK, (c * SQUARESIZE + BORDER, r * SQUARESIZE + BORDER, SQUARESIZE, SQUARESIZE), WIDTH)
@@ -73,17 +62,17 @@ def start_game():
     player_2 = pygame.draw.rect(screen, BLACK, (SQUARESIZE * .5 + BORDER + WIDTH, SQUARESIZE * 1.5 + BORDER + WIDTH, SQUARESIZE * 2 - (WIDTH * 2), SQUARESIZE / 2 - (WIDTH * 2)))
     player_random = pygame.draw.rect(screen, BLACK, (SQUARESIZE * .5 + BORDER + WIDTH, SQUARESIZE * 2 + BORDER + WIDTH, SQUARESIZE * 2 - (WIDTH * 2), SQUARESIZE / 2 - (WIDTH * 2)))
 
-    text, x2, y2 = message(24, "CHOOSE PLAYER", RED)
+    text, x2, y2 = message(24, "CHOOSE MOVE", RED)
     x1 = (SQUARESIZE * 2 - x2) / 2
     y1 = (SQUARESIZE / 2 - y2) / 2
     screen.blit(text, (SQUARESIZE * .5 + BORDER + x1, SQUARESIZE * .5 + BORDER + y1, SQUARESIZE * 2, SQUARESIZE))
 
-    text, x2, y2 = message(22, "PLAYER 1 - X", RED)
+    text, x2, y2 = message(22, "MOVE 1 - X", RED)
     x1 = (SQUARESIZE * 2 - x2) / 2
     y1 = (SQUARESIZE / 2 - y2) / 2
     screen.blit(text, (SQUARESIZE * .5 + BORDER + x1, SQUARESIZE + BORDER + y1, SQUARESIZE * 2, SQUARESIZE))
 
-    text, x2, y2 = message(22, "PLAYER 2 - O", RED)
+    text, x2, y2 = message(22, "MOVE 2 - O", RED)
     x1 = (SQUARESIZE * 2 - x2) / 2
     y1 = (SQUARESIZE / 2 - y2) / 2
     screen.blit(text, (SQUARESIZE * .5 + BORDER + x1, SQUARESIZE * 1.5 + BORDER + y1, SQUARESIZE * 2, SQUARESIZE))
@@ -97,72 +86,76 @@ def start_game():
 
     player_icon, ai_icon = choose_turn(player_1, player_2, player_random)
 
+    text, x2, y2 = message(26, "YOU - {}".format(player_icon), RED)
+    x1 = (SQUARESIZE + BORDER - x2) / 2
+    y1 = (BORDER + WIDTH- y2) / 2
+    screen.blit(text, (x1, ROWS * SQUARESIZE + BORDER + y1, BORDER + SQUARESIZE, BORDER))
+    
+    text, x2, y2 = message(26, "AI - {}".format(ai_icon), RED)
+    x1 = (SQUARESIZE + BORDER - x2) / 2
+    y1 = (BORDER + WIDTH - y2) / 2
+    screen.blit(text, (SQUARESIZE * 2 + BORDER + x1, ROWS * SQUARESIZE + BORDER + y1, BORDER + SQUARESIZE, BORDER))
+
     if ai_icon == "X":
-        ai_order = 1
         player_order = 2
     else:
-        ai_order = 2
         player_order = 1
 
-    draw_board(grid)
+    draw_board(grid, player_icon, ai_icon)
 
-    return grid, curr_turn, tie, player_icon, player_order, ai_icon, ai_order
+    return grid, curr_turn, tie, player_icon, player_order, ai_icon
 
 
-def get_score(temp_grid, player_icon, ai_icon):
+def get_score(temp_grid, curr_turn, player_icon, ai_icon):
     total = 0
     if check_win(temp_grid):
         total += 100
-
-    c1_count = []
-    c2_count = []
-    c3_count = []
-    d1_count = []
-    d2_count = []
+    c1 = []
+    c2 = []
+    c3 = []
+    d1 = []
+    d2 = []
+    grid_array = [c1, c2, c3, d1, d2]
     for r in range(ROWS):
-        d1_count.append(temp_grid[r][r])
-        d2_count.append(temp_grid[r][COLUMNS - r - 1])
+        d1.append(temp_grid[r][r])
+        d2.append(temp_grid[r][COLUMNS - r - 1])
+
         if temp_grid[r].count(player_icon) == 2 and temp_grid[r].count(ai_icon) < 1:
-            total -= 50
+            total -= 80
+        if temp_grid[r].count(player_icon) == 0 and temp_grid[r].count(ai_icon) == 2:
+            total += 20
+        if temp_grid[r].count(player_icon) == 0 and temp_grid[r].count(ai_icon) == 1:
+            total += 8
+
         for c in range(COLUMNS):
             if c == 0:
-                c1_count.append(temp_grid[r][c])
+                c1.append(temp_grid[r][c])
             elif c == 1:
-                c2_count.append(temp_grid[r][c])
+                c2.append(temp_grid[r][c])
             elif c == 2:
-                c3_count.append(temp_grid[r][c])
+                c3.append(temp_grid[r][c])
             
-    if c1_count.count(player_icon) == 2 and c1_count.count(ai_icon) < 1:
-        total -= 50
-    if c1_count.count(player_icon) == 0 and c1_count.count(ai_icon) == 2:
-        total += 10
+    for i in range(len(grid_array)):
+        if grid_array[i].count(player_icon) == 2 and grid_array[i].count(ai_icon) < 1:
+            total -= 80
+        if i < COLUMNS:
 
-    if c2_count.count(player_icon) == 2 and c2_count.count(ai_icon) < 1:
-        total -= 50
-    if c2_count.count(player_icon) == 0 and c2_count.count(ai_icon) == 2:
-        total += 10
+            if grid_array[i].count(player_icon) == 0 and grid_array[i].count(ai_icon) == 2:
+                total += 20
+            if grid_array[i].count(player_icon) == 0 and grid_array[i].count(ai_icon) == 1:
+                total += 8   
+        else:
+            if grid_array[i].count(player_icon) == 0 and grid_array[i].count(ai_icon) == 2:
+                total += 16
+            if grid_array[i].count(player_icon) == 0 and grid_array[i].count(ai_icon) == 1:
+                total += 6
+    if curr_turn == 1 and temp_grid[1][1] == ai_icon:
+        total -= 80
 
-    if c3_count.count(player_icon) == 2 and c3_count.count(ai_icon) < 1:
-        total -= 50
-    if c3_count.count(player_icon) == 0 and c3_count.count(ai_icon) == 2:
-        total += 10
-
-    if d1_count.count(player_icon) == 2 and d1_count.count(ai_icon) < 1:
-        total -= 50
-    if d1_count.count(player_icon) == 0 and d1_count.count(ai_icon) == 2:
-        total += 8
-
-    if d2_count.count(player_icon) == 2 and d2_count.count(ai_icon) < 1:
-        total -= 50
-    if d2_count.count(player_icon) == 0 and d2_count.count(ai_icon) == 2:
-        total += 8
-
-    if ai_icon == "O" and temp_grid[1][1] == "":
-        total -= 5
     return total
 
 
-def ai_move(grid, player_icon, ai_icon):
+def ai_move(grid, curr_turn, player_icon, ai_icon):
     best_score = -100
     best_row = -1
     best_column = -1
@@ -170,7 +163,7 @@ def ai_move(grid, player_icon, ai_icon):
         for c in range(COLUMNS):
             if grid[r][c] == "":
                 grid[r][c] = ai_icon
-                score = get_score(grid, player_icon, ai_icon)
+                score = get_score(grid, curr_turn, player_icon, ai_icon)
                 if score > best_score:
                     best_row = r
                     best_column = c
@@ -201,15 +194,15 @@ def choose_turn(X, O, rand):
         return "O", "X"
 
 
-def draw_board(grid):
+def draw_board(grid, player_icon, ai_icon):
     pygame.draw.rect(screen, GRAY, (BORDER, BORDER, COLUMNS * SQUARESIZE, ROWS * SQUARESIZE))
     
-    text, x2, y2 = message(18, "PLAYER 1 - X", RED)
+    text, x2, y2 = message(26, "YOU - {}".format(player_icon), RED)
     x1 = (SQUARESIZE + BORDER - x2) / 2
     y1 = (BORDER + WIDTH - y2) / 2
     screen.blit(text, (x1, ROWS * SQUARESIZE + BORDER + y1, BORDER + SQUARESIZE, BORDER))
     
-    text, x2, y2 = message(18, "PLAYER 2 - O", RED)
+    text, x2, y2 = message(26, "AI - {}".format(ai_icon), RED)
     x1 = (SQUARESIZE + BORDER - x2) / 2
     y1 = (BORDER + WIDTH - y2) / 2
     screen.blit(text, (SQUARESIZE * 2 + BORDER + x1, ROWS * SQUARESIZE + BORDER + y1, BORDER + SQUARESIZE, BORDER))
@@ -244,13 +237,13 @@ def valid_move(x, y, grid):
     return False
 
 
-def game_over(tie, curr_turn):
+def game_over(tie, curr_turn, player_icon):
     winner = ""
     if not tie:
-        if curr_turn % 2 != 0:
-            winner = "PLAYER 2 WINS"
+        if curr_turn % 2 == player_icon % 2:
+            winner = "AI WINS"
         else:
-            winner = "PLAYER 1 WINS"
+            winner = "YOU WIN"
     else:
         winner = "DRAW"
 
