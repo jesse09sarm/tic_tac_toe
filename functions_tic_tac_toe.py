@@ -116,7 +116,7 @@ def start_game():
 def get_score(temp_grid, curr_turn, player_icon, ai_icon):
     total = 0
     if check_win(temp_grid):
-        total += 100
+        total += 1000
     c1 = []
     c2 = []
     c3 = []
@@ -129,8 +129,8 @@ def get_score(temp_grid, curr_turn, player_icon, ai_icon):
 
         if temp_grid[r].count(player_icon) == 2 and temp_grid[r].count(ai_icon) < 1:
             total -= 100
-        if temp_grid[r].count(player_icon) == 0 and temp_grid[r].count(ai_icon) == 2:
-            total += 20
+        elif temp_grid[r].count(player_icon) == 0 and temp_grid[r].count(ai_icon) == 2:
+            total += 30
 
         for c in range(COLUMNS):
             if c == 0:
@@ -139,7 +139,7 @@ def get_score(temp_grid, curr_turn, player_icon, ai_icon):
                     total += 10
             elif c == 1:
                 c2.append(temp_grid[r][c])
-            elif c == 2:
+            else:
                 c3.append(temp_grid[r][c])
                 if r == 0 or r == ROWS - 1 and temp_grid[r][c] == ai_icon:
                     total += 10
@@ -149,63 +149,12 @@ def get_score(temp_grid, curr_turn, player_icon, ai_icon):
             total -= 100
         if i < COLUMNS:
             if grid_array[i].count(player_icon) == 0 and grid_array[i].count(ai_icon) == 2:
-                total += 20
-        else:
-            if grid_array[i].count(player_icon) == 0 and grid_array[i].count(ai_icon) == 2:
-                total += 16
+                total += 30
+        elif grid_array[i].count(player_icon) == 0 and grid_array[i].count(ai_icon) == 2:
+            total += 16
 
     if curr_turn == 2 and temp_grid[1][1] == ai_icon:
-        total += 100
-
-
-
-
-    # total = 0
-    # if check_win(temp_grid):
-    #     total += 1000
-    # c1 = []
-    # c2 = []
-    # c3 = []
-    # d1 = []
-    # d2 = []
-    # grid_array = [c1, c2, c3, d1, d2]
-    # for r in range(ROWS):
-    #     d1.append(temp_grid[r][r])
-    #     d2.append(temp_grid[r][COLUMNS - r - 1])
-
-    #     if temp_grid[r].count(player_icon) == 2 and temp_grid[r].count(ai_icon) < 1:
-    #         total -= 100
-    #     if temp_grid[r].count(player_icon) == 0 and temp_grid[r].count(ai_icon) == 2:
-    #         total += 20
-    #     if temp_grid[r].count(player_icon) == 0 and temp_grid[r].count(ai_icon) == 1:
-    #         total += 8
-
-    #     for c in range(COLUMNS):
-    #         if c == 0:
-    #             c1.append(temp_grid[r][c])
-    #         elif c == 1:
-    #             c2.append(temp_grid[r][c])
-    #         elif c == 2:
-    #             c3.append(temp_grid[r][c])
-            
-    # for i in range(len(grid_array)):
-    #     if grid_array[i].count(player_icon) == 2 and grid_array[i].count(ai_icon) < 1:
-    #         total -= 100
-    #     if i < COLUMNS:
-    #         if grid_array[i].count(player_icon) == 0 and grid_array[i].count(ai_icon) == 2:
-    #             total += 20
-    #         if grid_array[i].count(player_icon) == 0 and grid_array[i].count(ai_icon) == 1:
-    #             total += 8   
-    #     else:
-    #         if grid_array[i].count(player_icon) == 0 and grid_array[i].count(ai_icon) == 2:
-    #             total += 16
-    #         if grid_array[i].count(player_icon) == 0 and grid_array[i].count(ai_icon) == 1:
-    #             total += 6
-
-    # if curr_turn == 1 and temp_grid[1][1] == ai_icon:
-    #     total -= 100
-    # if curr_turn == 2 and temp_grid[1][1] == ai_icon:
-    #     total += 1000
+        total += 1000
 
     return total
 
