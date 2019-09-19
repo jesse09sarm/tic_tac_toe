@@ -7,9 +7,9 @@ draw_board(board, player, ai)
 play_again = True
 while play_again:
     if turn % 2 != player_turn % 2:
-        pygame.time.wait(300)
         board = ai_move(board, turn, player, ai)
         turn += 1
+        pygame.time.wait(300)
         draw_board(board, player, ai)
         if check_win(board) or turn > 9:
             if not check_win(board):

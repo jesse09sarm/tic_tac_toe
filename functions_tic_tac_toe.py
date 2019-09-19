@@ -93,16 +93,6 @@ def start_game():
 
     player_icon, ai_icon = choose_turn(player_1, player_2, player_random)
 
-    text, x2, y2 = message(26, "YOU - {}".format(player_icon), RED)
-    x1 = (SQUARESIZE + BORDER - x2) / 2
-    y1 = (BORDER + WIDTH- y2) / 2
-    screen.blit(text, (x1, ROWS * SQUARESIZE + BORDER + y1, BORDER + SQUARESIZE, BORDER))
-    
-    text, x2, y2 = message(26, "AI - {}".format(ai_icon), RED)
-    x1 = (SQUARESIZE + BORDER - x2) / 2
-    y1 = (BORDER + WIDTH - y2) / 2
-    screen.blit(text, (SQUARESIZE * 2 + BORDER + x1, ROWS * SQUARESIZE + BORDER + y1, BORDER + SQUARESIZE, BORDER))
-
     if ai_icon == "X":
         player_order = 2
     else:
@@ -127,26 +117,30 @@ def get_score(temp_grid, curr_turn, player_icon, ai_icon):
         d1.append(temp_grid[r][r])
         d2.append(temp_grid[r][COLUMNS - r - 1])
 
-        if temp_grid[r].count(player_icon) == 2 and temp_grid[r].count(ai_icon) < 1:
+        if temp_grid[r].count(player_icon) == 2 and temp_grid[r].count(ai_icon) == 0:
             total -= 100
+        elif temp_grid[r].count(player_icon) == 1 and temp_grid[r].count(ai_icon) == 0:
+            total -= 2
         elif temp_grid[r].count(player_icon) == 0 and temp_grid[r].count(ai_icon) == 2:
             total += 30
 
         for c in range(COLUMNS):
             if c == 0:
                 c1.append(temp_grid[r][c])
-                if r == 0 or r == ROWS - 1 and temp_grid[r][c] == ai_icon:
+                if (r == 0 or r == ROWS - 1) and temp_grid[r][c] == ai_icon:
                     total += 10
             elif c == 1:
                 c2.append(temp_grid[r][c])
-            else:
+            elif c == 2:
                 c3.append(temp_grid[r][c])
-                if r == 0 or r == ROWS - 1 and temp_grid[r][c] == ai_icon:
+                if (r == 0 or r == ROWS - 1) and temp_grid[r][c] == ai_icon:
                     total += 10
             
     for i in range(len(grid_array)):
-        if grid_array[i].count(player_icon) == 2 and grid_array[i].count(ai_icon) < 1:
+        if grid_array[i].count(player_icon) == 2 and grid_array[i].count(ai_icon) == 0:
             total -= 100
+        elif grid_array[i].count(player_icon) == 1 and grid_array[i].count(ai_icon) == 0:
+            total -= 2
         if i < COLUMNS:
             if grid_array[i].count(player_icon) == 0 and grid_array[i].count(ai_icon) == 2:
                 total += 30
@@ -167,13 +161,19 @@ def ai_move(grid, curr_turn, player_icon, ai_icon):
         for c in range(COLUMNS):
             if grid[r][c] == "":
                 grid[r][c] = ai_icon
+                print()
                 score = get_score(grid, curr_turn, player_icon, ai_icon)
+                
+                print(r,c," ", score)
+                print()
                 if score > best_score:
+                    
                     best_row = r
                     best_column = c
                     best_score = score
                 grid[r][c] = ""
     grid[best_row][best_column] = ai_icon
+    print("-------")
     return grid
     
 
@@ -258,26 +258,30 @@ def game_over(tie, curr_turn, player_icon):
 
     pygame.display.update()
 
-    pygame.time.wait(1500)
+    pygame.time.wait(1000)
     pygame.draw.rect(screen, D_GRAY, (SQUARESIZE * .5 + BORDER, SQUARESIZE * .5 + BORDER, SQUARESIZE * 2, SQUARESIZE * 1))
-    no_block = pygame.draw.rect(screen, RED, (SQUARESIZE * .5 + BORDER, SQUARESIZE * 1.5 + BORDER, SQUARESIZE * 1, SQUARESIZE * 1))
-    yes_block = pygame.draw.rect(screen, GREEN, (SQUARESIZE * 1.5 + BORDER, SQUARESIZE * 1.5 + BORDER, SQUARESIZE * 1, SQUARESIZE * 1))
+    pygame.draw.rect(screen, BLACK, (SQUARESIZE * .5 + BORDER, SQUARESIZE * 1.5 + BORDER, SQUARESIZE * 2, SQUARESIZE * 1))
     
         
-    text, x2, y2 = message(24, "PLAY AGAIN?", BLACK)
+    text, x2, y2 = message(28, "PLAY AGAIN?", BLACK)
     x1 = (2 * SQUARESIZE - x2) / 2
     y1 = (SQUARESIZE - y2) / 2
     screen.blit(text, (.5 * SQUARESIZE + BORDER + x1, .5 * SQUARESIZE + BORDER + y1, SQUARESIZE, SQUARESIZE))
         
-    text, x2, y2 = message(26, "NO", BLACK)
+    text, x2, y2 = message(30, "YES", BLACK)
+    x1 = (SQUARESIZE - x2) / 2
+    y1 = (SQUARESIZE - y2) / 2
+    
+    yes_block = pygame.draw.rect(screen, GREEN, (1.5 * SQUARESIZE + BORDER + x1 - (2 * WIDTH), 1.5 * SQUARESIZE + BORDER + y1 - (2 * WIDTH), 4 * WIDTH + x2, 4 * WIDTH + y2))
+    no_block = pygame.draw.rect(screen, RED, (.5 * SQUARESIZE + BORDER + x1 - (2 * WIDTH), 1.5 * SQUARESIZE + BORDER + y1 - (2 * WIDTH), 4 * WIDTH + x2, 4 * WIDTH + y2))
+
+    screen.blit(text, (1.5 * SQUARESIZE + BORDER + x1, 1.5 * SQUARESIZE + BORDER + y1, SQUARESIZE, SQUARESIZE))
+
+    text, x2, y2 = message(30, "NO", BLACK)
     x1 = (SQUARESIZE - x2) / 2
     y1 = (SQUARESIZE - y2) / 2
     screen.blit(text, (.5 * SQUARESIZE + BORDER + x1, 1.5 * SQUARESIZE + BORDER + y1, SQUARESIZE, SQUARESIZE))
         
-    text, x2, y2 = message(26, "YES", BLACK)
-    x1 = (SQUARESIZE - x2) / 2
-    y1 = (SQUARESIZE - y2) / 2
-    screen.blit(text, (1.5 * SQUARESIZE + BORDER + x1, 1.5 * SQUARESIZE + BORDER + y1, SQUARESIZE, SQUARESIZE))
    
     pygame.display.update()
 
